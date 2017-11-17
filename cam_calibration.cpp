@@ -452,10 +452,13 @@ int main(int argc, char* argv[])
                 continue;
             remap(view, rview, map1, map2, INTER_LINEAR);
             imshow("Image View", rview);
+            imwrite( format("../images_undistorted/%d.jpg", i ), rview );            
             char c = (char)waitKey();
             if( c  == ESC_KEY || c == 'q' || c == 'Q' )
                 break;
         }
+
+        for
     }
     //! [show_results]
 
