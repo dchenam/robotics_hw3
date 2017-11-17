@@ -452,10 +452,18 @@ int main(int argc, char* argv[])
                 continue;
             remap(view, rview, map1, map2, INTER_LINEAR);
             imshow("Image View", rview);
+            cv::String imName = format("./images_undistorted/%d.jpg", i );
+            imwrite( imName, rview );
             char c = (char)waitKey();
             if( c  == ESC_KEY || c == 'q' || c == 'Q' )
                 break;
         }
+        cv::String imName = format("./images/21.jpg");
+        view = imread(imName, IMREAD_COLOR);
+        remap(view, rview, map1, map2, INTER_LINEAR);
+        imshow("Image View", rview);
+        cv::String outName = format("./images_undistorted/21.jpg");
+        imwrite( outName, rview );
     }
     //! [show_results]
 
