@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( find_centroid )
+find_package( OpenCV REQUIRED )
+add_executable( find_centroid main.cpp )
+target_link_libraries( find_centroid ${OpenCV_LIBS} )
