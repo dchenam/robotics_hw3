@@ -20,55 +20,61 @@ int main(int argc, char **argv) {
 	if ( argc != 2 )
 		exit(1);
 
-	cv::Mat SrcImage, WorkImage, ComImage;
+	Mat SrcImage, WorkImage, ComImage;
 	
 	// Load a gray scale picture.
-	SrcImage = cv::imread(argv[1], 0);
+	SrcImage = imread(argv[1], 0);
 	if (!SrcImage.data)
 		exit(1);
 
 	// Create windows for debug.
-	cv::namedWindow("SrcImage", cv::WINDOW_AUTOSIZE);
-	cv::namedWindow("WorkImage", cv::WINDOW_AUTOSIZE);
-	cv::namedWindow("ComImage", cv::WINDOW_AUTOSIZE);
+	namedWindow("SrcImage", cv::WINDOW_AUTOSIZE);
+	namedWindow("WorkImage", cv::WINDOW_AUTOSIZE);
+	namedWindow("ComImage", cv::WINDOW_AUTOSIZE);
 	// Show the source image.
-	cv::imshow("SrcImage", SrcImage);
-	cv::waitKey();
+	imshow("SrcImage", SrcImage);
+	waitKey();
 
 	// Duplicate the source iamge.
 	WorkImage = SrcImage.clone();	
 	
   //Extract the contour of 
 	/* If you're familiar with OpenCV, findContours() will be a better way.*/
-	cv::GaussianBlur(WorkImage, WorkImage, cv::Size(5, 5), 0, 0);
-	cv::threshold(WorkImage, WorkImage, 128, 255, cv::THRESH_BINARY);
+	GaussianBlur(WorkImage, WorkImage, Size(5, 5), 0, 0);
+	threshold(WorkImage, WorkImage, 128, 255, cv::THRESH_BINARY);
 
 	// Opening
-	cv::erode(WorkImage, WorkImage, cv::Mat());
-	cv::dilate(WorkImage, WorkImage, cv::Mat());
+	int element_size = 4;
+	int element_type = MORPH_RECT;
+	Mat element = getStructuringElement( element_type,
+			Size( 2*element_size + 1, 2*element_size + 1 ),
+			Point( element_size, element_size ) );
+	erode(WorkImage, WorkImage, element);
+	dilate(WorkImage, WorkImage, element);
 
 	// Duplicate the working iamge.
 	ComImage = WorkImage.clone();
-	cv::Mat canny_output;
+
+	Mat canny_output;
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 
 	/// Detect edges using canny
 	Canny(ComImage, canny_output, thresh, thresh*2, 3 );
-	cv::imshow("WorkImage", canny_output);
-	cv::waitKey();
+	imshow("WorkImage", canny_output);
+	waitKey();
 
 	/// Find contours
-	findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+	findContours(canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
 	cout << contours.size() << endl;
 
-	/// Get the moments
+	// Get the moments
 	vector<Moments> mu(contours.size());
 	for( int i = 0; i < contours.size(); i++ )
 	 { mu[i] = moments( contours[i], false ); }
 
-	///  Get the mass centers:
+	//  Get the mass centers:
 	vector<Point2f> mc( contours.size() );
 	for( int i = 0; i < contours.size(); i++ )
 	 {
@@ -89,7 +95,8 @@ int main(int argc, char **argv) {
 	// Show the working image after preprocessing.
 
 	cv::imshow("ComImage", drawing);
-  cv::waitKey();
+  	cv::waitKey();
 
 	return 0;
 }
+
